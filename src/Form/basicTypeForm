@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\Risks;
+use App\Repository\DepartmentsRepository;
+use App\Repository\ProcessDescriptionRepository;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class basicTypeForm extends AbstractType
+{
+    // get the repos of the entities needed for the dropdown
+    public function __construct(private CityRepository $cityRepo, private CountryRepository $countryRepo){
+
+    }
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+        // add only the main dropdown
+        // dynamicaly will add the dependend dropdown
+            ->add('country', ChoiceType::class, [
+                'choices'=> $this->getCountries(),
+                'placeholder' => 'Select country',
+            ])
+          
+        ;
+        $ff = $builder->getFormFactory();
+        // function to add 'cities' choice field dynamically
+        $func = function (FormEvent $e) use ($ff) {
+            $data = $e->getData();
+            $form = $e->getForm();
+            if(is_array($data)){
+                // pre_post data is array
+                $department = $data['department'];
+            } else {
+                // object ?! :D
+                $department = $data->getDepartment();
+            }
+            // set choices for dependend dropdown
+                 $form->add('cities',ChoiceType::class,[
+                    'placeholder'=>'select city',
+                    'choices'=>$this->cityRepo->arrayOfCitiesByCountry($country)
+                ]);
+        };
+
+        // Register the function above as EventListener on PreSet and PreBind
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
+    }
+    public function getCountries(){
+        return  $this->countryRepo->arrayOfCountries();
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Risks::class,
+        ]);
+    }
+}
