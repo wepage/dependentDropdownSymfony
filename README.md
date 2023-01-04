@@ -1,6 +1,6 @@
-# dependentDropdownSymfony
-Symfony 6 Dependent Dropdowns from database using ajax for dynamicaly loading second dropdown
-# form can be used for creating new entity entry and for editing existing entry, it will select the values firstry been selected
+ dependentDropdownSymfony
+#Symfony 6 Dependent Dropdowns from database using ajax for dynamicaly loading second dropdown
+ form can be used for creating new entity entry and for editing existing entry, it will select the values firstry been selected
 
 #Need a endpoint to post ajax to get json responce with the cities by country 
         $cities = json_decode($this->serializer->serialize($this->citiesRepo->citiesByCountry($country), 'json'), true);
@@ -8,7 +8,7 @@ Symfony 6 Dependent Dropdowns from database using ajax for dynamicaly loading se
          // e.g
         // [{"id":"3","name":"Rousse"},{"id":"4","name":"Sofia"}]
 
-AJAX EXAMPLE
+#AJAX EXAMPLE
 <script>
         $('#form_country').change(function() {
             let country = $(this);
